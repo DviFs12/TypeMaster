@@ -1,1675 +1,378 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TypeMaster — Treinamento de Digitação</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-/* ─── RESET & VARIABLES ─── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TypeMaster — Treinamento de digitação profissional com heatmap, análise e PWA.">
+  <meta name="theme-color" content="#f5a623">
+  <title>TypeMaster v3</title>
 
-:root {
-  --bg: #0d0d0f;
-  --bg2: #13131a;
-  --bg3: #1c1c28;
-  --surface: #1e1e2e;
-  --surface2: #262640;
-  --border: #2e2e4a;
-  --text: #e8e8f0;
-  --text2: #9090b0;
-  --text3: #5a5a80;
-  --accent: #f5a623;
-  --accent2: #ff6b35;
-  --green: #50fa7b;
-  --red: #ff5555;
-  --blue: #6272a4;
-  --cursor: #f5a623;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Syne', sans-serif;
-  --fs: 16px;
-  --radius: 8px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --transition: 0.2s ease;
-}
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="TypeMaster">
 
-[data-theme="light"] {
-  --bg: #f4f4f0;
-  --bg2: #eaeae4;
-  --bg3: #e0e0d8;
-  --surface: #ffffff;
-  --surface2: #f8f8f4;
-  --border: #d0d0c4;
-  --text: #1a1a2e;
-  --text2: #555570;
-  --text3: #999aaa;
-  --accent: #d4840a;
-  --accent2: #e05020;
-  --green: #2d8a50;
-  --red: #cc2222;
-  --shadow: 0 4px 24px rgba(0,0,0,0.1);
-}
+  <!-- Styles (no inline) -->
+  <link rel="stylesheet" href="css/style.css">
 
-html { font-size: var(--fs); scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font-mono);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  transition: background var(--transition), color var(--transition);
-}
-
-/* ─── BACKGROUND TEXTURE ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(ellipse at 20% 20%, rgba(245,166,35,0.04) 0%, transparent 60%),
-                    radial-gradient(ellipse at 80% 80%, rgba(98,114,164,0.05) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ─── LAYOUT ─── */
-.app { position: relative; z-index: 1; }
-
-/* ─── NAV ─── */
-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid var(--border);
-  background: rgba(13,13,15,0.85);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-[data-theme="light"] nav { background: rgba(244,244,240,0.9); }
-
-.logo {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--accent);
-  letter-spacing: -0.02em;
-  cursor: pointer;
-}
-.logo span { color: var(--text); font-weight: 400; }
-
-.nav-links { display: flex; gap: 0.25rem; }
-
-.nav-btn {
-  background: none;
-  border: 1px solid transparent;
-  color: var(--text2);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all var(--transition);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.nav-btn:hover, .nav-btn.active {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: rgba(245,166,35,0.08);
-}
-
-/* ─── PAGES ─── */
-.page { display: none; min-height: calc(100vh - 61px); }
-.page.active { display: flex; flex-direction: column; }
-
-/* ─── HOME ─── */
-#home {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 4rem 2rem;
-  gap: 3rem;
-}
-
-.hero { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid rgba(245,166,35,0.3);
-  padding: 0.35rem 0.8rem;
-  border-radius: 100px;
-  background: rgba(245,166,35,0.06);
-}
-.hero-badge::before { content: '●'; animation: pulse 2s infinite; }
-
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  color: var(--text);
-}
-.hero-title .highlight { color: var(--accent); }
-
-.hero-sub {
-  font-size: 0.9rem;
-  color: var(--text2);
-  max-width: 420px;
-  line-height: 1.7;
-}
-
-.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-
-.btn {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.8rem 1.8rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #0d0d0f;
-}
-.btn-primary:hover { background: #ffbe55; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,166,35,0.3); }
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
-.btn-ghost {
-  background: transparent;
-  color: var(--text2);
-  border: 1px solid var(--border);
-}
-.btn-ghost:hover { color: var(--text); border-color: var(--text3); }
-.btn-sm { padding: 0.5rem 1rem; font-size: 0.72rem; }
-
-/* Stats cards */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  max-width: 560px;
-  width: 100%;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.2rem 1rem;
-  text-align: center;
-}
-.stat-val {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-}
-.stat-lbl { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.4rem; }
-
-/* History list */
-.history-section { width: 100%; max-width: 560px; }
-.history-section h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 0.75rem; }
-.history-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 160px; overflow-y: auto; }
-.history-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 0.5rem 0.9rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  color: var(--text2);
-}
-.history-item .wpm { color: var(--accent); font-weight: 700; }
-.empty-state { color: var(--text3); font-size: 0.78rem; text-align: center; padding: 1rem; }
-
-/* ─── PRACTICE ─── */
-#pratica {
-  padding: 2rem;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.practice-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 820px;
-}
-.practice-header h2 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--text);
-}
-
-/* Metrics bar */
-.metrics-bar {
-  display: flex;
-  gap: 1.5rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.9rem 1.5rem;
-  width: 100%;
-  max-width: 820px;
-}
-.metric { display: flex; flex-direction: column; align-items: center; flex: 1; }
-.metric-val {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-}
-.metric-lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text3); margin-top: 0.2rem; }
-
-/* Countdown overlay */
-.countdown-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(13,13,15,0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  backdrop-filter: blur(8px);
-}
-.countdown-overlay.hidden { display: none; }
-.countdown-num {
-  font-family: var(--font-display);
-  font-size: 8rem;
-  font-weight: 800;
-  color: var(--accent);
-  animation: countPop 1s ease-out;
-}
-@keyframes countPop {
-  0% { transform: scale(2); opacity: 0; }
-  30% { opacity: 1; transform: scale(1); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: scale(0.8); }
-}
-
-/* Typing area */
-.typing-container {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 820px;
-  position: relative;
-  overflow: hidden;
-}
-.typing-container::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-}
-
-.phrase-display {
-  font-family: var(--font-mono);
-  font-size: 1.3rem;
-  line-height: 2;
-  letter-spacing: 0.05em;
-  user-select: none;
-  white-space: pre-wrap;
-  word-break: break-word;
-  min-height: 3rem;
-}
-
-.char { position: relative; }
-.char.correct { color: var(--green); }
-.char.incorrect { color: var(--red); text-decoration: underline; }
-.char.current {
-  color: var(--text);
-  background: rgba(245,166,35,0.15);
-  border-radius: 2px;
-}
-.char.current::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 100%; height: 2px;
-  background: var(--accent);
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
-
-/* Progress bar */
-.progress-bar-wrap {
-  height: 4px;
-  background: var(--bg3);
-  border-radius: 2px;
-  margin-top: 1rem;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  border-radius: 2px;
-  transition: width 0.1s ease;
-  width: 0%;
-}
-
-/* Hidden input */
-#typing-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  width: 1px;
-  height: 1px;
-}
-
-.practice-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
-
-/* Results panel */
-.results-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 820px;
-  text-align: center;
-  animation: slideUp 0.4s ease;
-}
-.results-panel.hidden { display: none; }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
-.results-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin: 1.5rem 0; }
-.result-item .val { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--accent); }
-.result-item .lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text3); margin-top: 0.3rem; }
-.result-msg { font-size: 1rem; color: var(--text2); margin-bottom: 1.5rem; }
-
-/* ─── TRAINING ─── */
-#treino {
-  padding: 2rem;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.lesson-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 820px;
-}
-.lesson-header h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; }
-
-.lesson-progress {
-  display: flex;
-  gap: 0.3rem;
-  align-items: center;
-}
-.lesson-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--border);
-  transition: background var(--transition);
-}
-.lesson-dot.done { background: var(--green); }
-.lesson-dot.current { background: var(--accent); }
-
-.lesson-info {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.5rem;
-  width: 100%;
-  max-width: 820px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.lesson-name { font-size: 0.85rem; color: var(--text); }
-.lesson-keys { font-size: 0.75rem; color: var(--accent); letter-spacing: 0.1em; }
-
-/* Virtual keyboard */
-.keyboard-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 820px;
-}
-.keyboard { display: flex; flex-direction: column; gap: 0.4rem; align-items: center; }
-.kb-row { display: flex; gap: 0.3rem; }
-.key {
-  min-width: 42px;
-  height: 42px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--text3);
-  cursor: default;
-  transition: all 0.15s ease;
-  position: relative;
-  padding: 0 8px;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.3);
-}
-.key.target {
-  background: rgba(245,166,35,0.15);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.key.highlight-green {
-  background: rgba(80,250,123,0.2);
-  border-color: var(--green);
-  color: var(--green);
-  animation: keyPress 0.2s ease;
-}
-.key.highlight-red {
-  background: rgba(255,85,85,0.2);
-  border-color: var(--red);
-  color: var(--red);
-  animation: keyShake 0.3s ease;
-}
-.key.learned { background: rgba(80,250,123,0.08); border-color: rgba(80,250,123,0.3); color: var(--green); }
-@keyframes keyPress { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-@keyframes keyShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-
-.key.wide { min-width: 64px; }
-.key.wider { min-width: 90px; }
-.key.space { min-width: 240px; }
-
-/* Training typing box */
-.train-typing-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
-  width: 100%;
-  max-width: 820px;
-}
-.train-phrase { font-size: 1.4rem; letter-spacing: 0.1em; line-height: 2; }
-.train-actions { display: flex; gap: 0.75rem; margin-top: 1rem; align-items: center; }
-.train-score { font-size: 0.78rem; color: var(--text3); flex: 1; text-align: right; }
-
-/* ─── SETTINGS ─── */
-#configuracoes {
-  padding: 2rem;
-  gap: 1.5rem;
-  align-items: center;
-}
-.settings-wrap {
-  width: 100%;
-  max-width: 560px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.settings-section h3 {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text3);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-.setting-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem 1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-bottom: 0.4rem;
-}
-.setting-label { font-size: 0.82rem; color: var(--text); }
-.setting-sub { font-size: 0.7rem; color: var(--text3); margin-top: 0.1rem; }
-
-/* Toggle */
-.toggle {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-}
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-track {
-  position: absolute;
-  inset: 0;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-.toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
-.toggle-track::after {
-  content: '';
-  position: absolute;
-  left: 3px; top: 3px;
-  width: 16px; height: 16px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform var(--transition);
-}
-.toggle input:checked + .toggle-track::after { transform: translateX(20px); }
-
-/* Select */
-select.setting-select {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  background: var(--bg3);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.35rem 0.7rem;
-  cursor: pointer;
-  outline: none;
-  transition: border-color var(--transition);
-}
-select.setting-select:focus { border-color: var(--accent); }
-
-/* Range */
-input[type="range"].setting-range {
-  -webkit-appearance: none;
-  width: 120px;
-  height: 4px;
-  background: var(--bg3);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-input[type="range"].setting-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px; height: 16px;
-  background: var(--accent);
-  border-radius: 50%;
-}
-
-/* ─── FOCUS MODE ─── */
-body.focus-mode nav { opacity: 0; pointer-events: none; }
-body.focus-mode .practice-header .practice-title-area { opacity: 0; }
-
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-/* ─── RESPONSIVE ─── */
-@media(max-width:640px) {
-  nav { padding: 0.75rem 1rem; }
-  .nav-btn { font-size: 0.65rem; padding: 0.35rem 0.65rem; }
-  #home { padding: 2rem 1rem; }
-  .stats-grid { grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
-  .stat-val { font-size: 1.4rem; }
-  #pratica, #treino, #configuracoes { padding: 1rem; }
-  .phrase-display { font-size: 1.1rem; }
-  .metrics-bar { flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; }
-  .key { min-width: 30px; height: 34px; font-size: 0.6rem; }
-  .key.space { min-width: 120px; }
-  .keyboard-wrap { padding: 1rem 0.5rem; overflow-x: auto; }
-  .results-grid { grid-template-columns: repeat(3,1fr); gap: 0.75rem; }
-  .result-item .val { font-size: 1.6rem; }
-  .settings-wrap { padding: 0; }
-}
-
-/* ─── TOAST ─── */
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 0.7rem 1.4rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  z-index: 300;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  opacity: 0;
-  white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-/* ─── ANIMATIONS ─── */
-.page.active > * {
-  animation: fadeIn 0.3s ease forwards;
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-</style>
+  <!-- JS Module (no inline) -->
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
 <div class="app">
 
-<!-- NAV -->
-<nav>
-  <div class="logo" onclick="showPage('home')">Type<span>Master</span></div>
-  <div class="nav-links">
-    <button class="nav-btn active" data-page="home" onclick="showPage('home')">Início</button>
-    <button class="nav-btn" data-page="treino" onclick="showPage('treino')">Treino</button>
-    <button class="nav-btn" data-page="pratica" onclick="showPage('pratica')">Praticar</button>
-    <button class="nav-btn" data-page="configuracoes" onclick="showPage('configuracoes')">Config</button>
-  </div>
-</nav>
-
-<!-- COUNTDOWN -->
-<div class="countdown-overlay hidden" id="countdown-overlay">
-  <div class="countdown-num" id="countdown-num">3</div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- ════════════ HOME ════════════ -->
-<section class="page active" id="home">
-  <div class="hero">
-    <div class="hero-badge">Treinamento de Digitação Profissional</div>
-    <h1 class="hero-title">Digite mais<br>rápido <span class="highlight">hoje.</span></h1>
-    <p class="hero-sub">Desenvolva velocidade e precisão com exercícios progressivos e métricas em tempo real.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showPage('treino')">▶ Iniciar Treino</button>
-      <button class="btn btn-secondary" onclick="showPage('pratica')">⌨ Praticar</button>
-      <button class="btn btn-ghost" onclick="showPage('configuracoes')">⚙ Config</button>
+  <!-- ═══════════════ NAV ═══════════════ -->
+  <nav>
+    <div class="logo" onclick="App.navigate('home')">Type<em>Master</em><sup>v3</sup></div>
+    <div class="nav-links">
+      <button class="nav-btn active" data-page="home"          onclick="App.navigate('home')">Início</button>
+      <button class="nav-btn"        data-page="pratica"       onclick="App.navigate('pratica')">Praticar</button>
+      <button class="nav-btn"        data-page="treino"        onclick="App.navigate('treino')">Treino</button>
+      <button class="nav-btn"        data-page="analise"       onclick="App.navigate('analise')">Análise</button>
+      <button class="nav-btn"        data-page="configuracoes" onclick="App.navigate('configuracoes')">Config</button>
     </div>
+  </nav>
+
+  <!-- COUNTDOWN OVERLAY -->
+  <div class="countdown-overlay hidden" id="countdown-overlay">
+    <div class="countdown-num" id="countdown-num">3</div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-val" id="home-best-wpm">—</div>
-      <div class="stat-lbl">Melhor WPM</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" id="home-avg-acc">—</div>
-      <div class="stat-lbl">Precisão Média</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" id="home-sessions">0</div>
-      <div class="stat-lbl">Sessões</div>
-    </div>
-  </div>
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <div class="history-section">
-    <h3>Histórico Recente</h3>
-    <div class="history-list" id="history-list">
-      <div class="empty-state">Nenhuma sessão ainda. Comece a praticar!</div>
-    </div>
-  </div>
-</section>
+  <!-- ═══════════════ HOME ═══════════════ -->
+  <section class="page active" id="home" role="main">
 
-<!-- ════════════ PRÁTICA ════════════ -->
-<section class="page" id="pratica">
-  <div class="practice-header">
-    <h2 class="practice-title-area">⌨ Modo Prática</h2>
-    <div style="display:flex;gap:0.5rem;">
-      <button class="btn btn-ghost btn-sm" id="focus-btn" onclick="toggleFocus()">Foco</button>
-    </div>
-  </div>
-
-  <div class="metrics-bar">
-    <div class="metric">
-      <div class="metric-val" id="m-wpm">0</div>
-      <div class="metric-lbl">WPM</div>
-    </div>
-    <div class="metric">
-      <div class="metric-val" id="m-acc">100%</div>
-      <div class="metric-lbl">Precisão</div>
-    </div>
-    <div class="metric">
-      <div class="metric-val" id="m-time">0s</div>
-      <div class="metric-lbl">Tempo</div>
-    </div>
-    <div class="metric">
-      <div class="metric-val" id="m-chars">0</div>
-      <div class="metric-lbl">Caracteres</div>
-    </div>
-  </div>
-
-  <div class="typing-container" onclick="focusInput()">
-    <div class="phrase-display" id="phrase-display"></div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="practice-progress"></div>
-    </div>
-    <input type="text" id="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-  </div>
-
-  <div class="practice-actions">
-    <button class="btn btn-ghost btn-sm" onclick="restartPractice()">↺ Reiniciar</button>
-    <button class="btn btn-ghost btn-sm" onclick="nextPhrase()">→ Próxima Frase</button>
-  </div>
-
-  <div class="results-panel hidden" id="results-panel">
-    <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;margin-bottom:0.5rem;">Resultado Final</h3>
-    <p class="result-msg" id="result-msg"></p>
-    <div class="results-grid">
-      <div class="result-item">
-        <div class="val" id="r-wpm">0</div>
-        <div class="lbl">WPM</div>
+    <div class="hero">
+      <div class="hero-eyebrow"><span class="dot">●</span> Treinamento de Digitação Profissional</div>
+      <h1 class="hero-title">Digite mais<br>rápido <span class="hl">hoje.</span></h1>
+      <p class="hero-sub">Velocidade, precisão e análise. Funciona offline — sem backend.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary"   onclick="App.navigate('pratica')">⌨ Praticar</button>
+        <button class="btn btn-secondary" onclick="App.navigate('treino')">📚 Treinar</button>
+        <button class="btn btn-ghost"     onclick="App.navigate('analise')">📊 Análise</button>
       </div>
-      <div class="result-item">
-        <div class="val" id="r-acc">0%</div>
-        <div class="lbl">Precisão</div>
+      <div class="streak-badge">🔥 <span id="streak-badge">— dias</span></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="home-best-wpm">—</div>
+        <div class="stat-lbl">Melhor WPM</div>
       </div>
-      <div class="result-item">
-        <div class="val" id="r-time">0s</div>
-        <div class="lbl">Tempo</div>
+      <div class="stat-card">
+        <div class="stat-val" id="home-avg-acc">—</div>
+        <div class="stat-lbl">Precisão Média</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="home-sessions">0</div>
+        <div class="stat-lbl">Sessões</div>
       </div>
     </div>
-    <div style="display:flex;gap:0.75rem;justify-content:center;">
-      <button class="btn btn-primary" onclick="nextPhrase()">→ Próxima</button>
-      <button class="btn btn-ghost btn-sm" onclick="restartPractice()">↺ Repetir</button>
+
+    <div class="home-section">
+      <span class="section-label">Histórico recente</span>
+      <div class="history-list" id="history-list">
+        <div class="empty-state">Nenhuma sessão ainda. Comece a praticar!</div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ════════════ TREINO ════════════ -->
-<section class="page" id="treino">
-  <div class="lesson-header">
-    <h2>📚 Modo Treinamento</h2>
-    <div class="lesson-progress" id="lesson-progress"></div>
-  </div>
+  </section>
 
-  <div class="lesson-info">
-    <div>
-      <div class="lesson-name" id="lesson-name">Lição 1 — Linha Base</div>
-      <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;" id="lesson-desc">Aprenda as teclas centrais</div>
+  <!-- ═══════════════ PRÁTICA ═══════════════ -->
+  <section class="page" id="pratica" aria-label="Modo Prática">
+
+    <div class="page-header">
+      <div class="page-title">⌨ Praticar</div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <button class="btn btn-ghost btn-sm" id="focus-btn" onclick="App.toggleFocus()">Foco</button>
+      </div>
     </div>
-    <div class="lesson-keys" id="lesson-keys">A S D F J K L ;</div>
-  </div>
 
-  <div class="keyboard-wrap">
-    <div class="keyboard" id="keyboard"></div>
-  </div>
-
-  <div class="train-typing-box" onclick="focusTrainInput()">
-    <div class="phrase-display train-phrase" id="train-display"></div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="train-progress"></div>
+    <!-- Mode selector -->
+    <div class="mode-selector" role="group" aria-label="Modo de prática">
+      <button class="mode-btn active" id="mode-normal"      onclick="Practice.setMode('normal')">Normal</button>
+      <button class="mode-btn"        id="mode-problem"     onclick="Practice.setMode('problem')">Problemáticas</button>
+      <button class="mode-btn"        id="mode-competitive" onclick="Practice.setMode('competitive')">Competitivo</button>
     </div>
-    <input type="text" id="train-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-           style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;">
-    <div class="train-actions">
-      <button class="btn btn-ghost btn-sm" onclick="restartLesson()">↺ Repetir Lição</button>
-      <button class="btn btn-ghost btn-sm" onclick="prevLesson()" id="btn-prev-lesson">← Anterior</button>
-      <button class="btn btn-primary btn-sm" onclick="nextLesson()" id="btn-next-lesson">Próxima →</button>
-      <div class="train-score" id="train-score"></div>
+
+    <!-- Metrics bar -->
+    <div class="metrics-bar" aria-label="Métricas em tempo real">
+      <div class="metric">
+        <div class="metric-val" id="m-wpm" aria-label="Palavras por minuto">0</div>
+        <div class="ghost-metric hidden" id="m-ghost-wpm" aria-label="WPM do ghost"></div>
+        <div class="metric-lbl">WPM</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-acc">100%</div>
+        <div class="metric-lbl">Precisão</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-time">0s</div>
+        <div class="metric-lbl">Tempo</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="m-chars">0</div>
+        <div class="metric-lbl">Chars</div>
+      </div>
+      <div class="metric">
+        <div class="consistency-badge" id="m-consistency">—</div>
+        <div class="metric-lbl">Consistência</div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ════════════ CONFIG ════════════ -->
-<section class="page" id="configuracoes">
-  <div class="settings-wrap">
-    <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-bottom:0.5rem;">⚙ Configurações</h2>
+    <!-- Typing container -->
+    <div class="typing-container" id="typing-container" onclick="Practice.focusInput()" aria-label="Área de digitação">
+      <div class="phrase-display" id="phrase-display" aria-live="off"></div>
+      <div class="progress-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" id="practice-progress"></div>
+      </div>
+      <input class="hidden-input" type="text" id="typing-input"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+             aria-label="Campo de digitação oculto">
+    </div>
 
-    <div class="settings-section">
-      <h3>Aparência</h3>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Tema Escuro</div>
-          <div class="setting-sub">Alterne entre modo claro e escuro</div>
+    <div class="typing-actions">
+      <button class="btn btn-ghost btn-sm" onclick="Practice.restart()">↺ Reiniciar</button>
+      <button class="btn btn-ghost btn-sm" onclick="Practice.nextPhrase()">→ Próxima</button>
+    </div>
+
+    <!-- Results panel -->
+    <div class="results-panel hidden" id="results-panel" role="region" aria-label="Resultado da sessão">
+      <div class="r-title">Resultado ✓</div>
+      <div class="r-msg" id="result-msg"></div>
+      <div class="r-grid">
+        <div class="r-item"><div class="r-val" id="r-wpm">0</div><div class="r-lbl">WPM</div></div>
+        <div class="r-item"><div class="r-val" id="r-acc">0%</div><div class="r-lbl">Precisão</div></div>
+        <div class="r-item"><div class="r-val" id="r-time">0s</div><div class="r-lbl">Tempo</div></div>
+        <div class="r-item"><div class="r-val" id="r-consistency">—</div><div class="r-lbl">Consistência</div></div>
+      </div>
+      <div class="r-comparison" id="r-comparison"></div>
+      <div class="r-actions">
+        <button class="btn btn-primary"  onclick="Practice.nextPhrase()">→ Próxima frase</button>
+        <button class="btn btn-ghost btn-sm" onclick="Practice.restart()">↺ Repetir</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════ TREINO ═══════════════ -->
+  <section class="page" id="treino" aria-label="Modo Treinamento">
+
+    <div class="page-header">
+      <div class="page-title">📚 Treinamento</div>
+      <div class="lesson-progress" id="lesson-progress" role="progressbar"></div>
+    </div>
+
+    <div class="lesson-info">
+      <div>
+        <div class="lesson-name" id="lesson-name">Lição 1</div>
+        <div class="lesson-desc" id="lesson-desc">Linha base</div>
+      </div>
+      <div class="lesson-keys" id="lesson-keys">A S D F J K L ;</div>
+    </div>
+
+    <div class="keyboard-wrap">
+      <div class="keyboard" id="keyboard" role="img" aria-label="Teclado virtual"></div>
+    </div>
+
+    <div class="typing-container" onclick="Training.focusInput()">
+      <div class="phrase-display" id="train-display"></div>
+      <div class="progress-wrap">
+        <div class="progress-fill" id="train-progress"></div>
+      </div>
+      <input class="hidden-input" type="text" id="train-input"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <div class="train-actions">
+        <button class="btn btn-ghost btn-sm"     onclick="Training.restart()">↺ Repetir</button>
+        <button class="btn btn-ghost btn-sm"     onclick="Training.prev()" id="btn-prev">← Anterior</button>
+        <button class="btn btn-secondary btn-sm" onclick="Training.next()" id="btn-next">Próxima →</button>
+        <div class="train-score" id="train-score"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════ ANÁLISE ═══════════════ -->
+  <section class="page" id="analise" aria-label="Análise de Performance">
+
+    <div class="page-header" style="max-width:820px;width:100%;">
+      <div class="page-title">📊 Análise</div>
+    </div>
+
+    <!-- Heatmap keyboard - full width -->
+    <div class="analysis-card full" style="width:100%;max-width:820px;">
+      <h3>🎯 Heatmap de Erros — Teclado Virtual</h3>
+      <div style="overflow-x:auto;">
+        <div class="keyboard" id="analysis-keyboard" role="img" aria-label="Heatmap do teclado"></div>
+      </div>
+      <div class="heat-legend">
+        <div class="heat-item"><div class="heat-dot low"></div> Baixo erro (&lt;10%)</div>
+        <div class="heat-item"><div class="heat-dot mid"></div> Médio (10–30%)</div>
+        <div class="heat-item"><div class="heat-dot high"></div> Alto (&gt;30%)</div>
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <!-- Problem keys -->
+      <div class="analysis-card">
+        <h3>⚠ Teclas Problemáticas</h3>
+        <div id="problem-keys-list">
+          <div class="empty-state">Pratique mais para gerar dados</div>
         </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-theme" onchange="applySettings()">
-          <div class="toggle-track"></div>
-        </label>
       </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Tamanho da Fonte</div>
-          <div class="setting-sub">Tamanho base da tipografia</div>
+
+      <!-- Session chart -->
+      <div class="analysis-card">
+        <h3>📈 WPM — Últimas 10 sessões</h3>
+        <div class="session-chart" id="session-chart">
+          <div class="empty-state" style="width:100%;text-align:center;">Sem dados ainda</div>
         </div>
-        <input type="range" class="setting-range" id="font-size" min="13" max="22" value="16" oninput="applySettings()">
       </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Alto Contraste</div>
-          <div class="setting-sub">Aumenta legibilidade</div>
+
+      <!-- Competitive comparison -->
+      <div class="analysis-card full">
+        <h3>🏁 Última vs. Penúltima Sessão</h3>
+        <div id="competitive-summary">
+          <div class="empty-state">Complete pelo menos 2 sessões para comparar</div>
         </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-contrast" onchange="applySettings()">
-          <div class="toggle-track"></div>
-        </label>
       </div>
     </div>
 
-    <div class="settings-section">
-      <h3>Experiência</h3>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Sons de Tecla</div>
-          <div class="setting-sub">Feedback sonoro ao digitar</div>
+    <!-- Ranking -->
+    <div class="analysis-card" style="width:100%;max-width:820px;">
+      <h3>🏆 Rankings Locais</h3>
+      <div class="ranking-grid">
+        <div class="rank-section">
+          <h4>Top WPM</h4>
+          <div id="rank-wpm"><div class="empty-state">Sem dados</div></div>
         </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-sound" onchange="applySettings()">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Dificuldade</div>
-          <div class="setting-sub">Comprimento das frases</div>
+        <div class="rank-section">
+          <h4>Top Precisão</h4>
+          <div id="rank-acc"><div class="empty-state">Sem dados</div></div>
         </div>
-        <select class="setting-select" id="difficulty" onchange="applySettings()">
-          <option value="easy">Fácil</option>
-          <option value="medium" selected>Médio</option>
-          <option value="hard">Difícil</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Idioma das Frases</div>
+        <div class="rank-section">
+          <h4>Top Consistência</h4>
+          <div id="rank-cons"><div class="empty-state">Sem dados</div></div>
         </div>
-        <select class="setting-select" id="language" onchange="applySettings()">
-          <option value="pt">Português</option>
-          <option value="en">English</option>
-        </select>
+        <div class="rank-section">
+          <h4>Streak</h4>
+          <div class="streak-summary">
+            <div class="streak-item">
+              <div class="s-val" id="rank-streak-current">0</div>
+              <div class="s-lbl">Atual</div>
+            </div>
+            <div class="streak-item">
+              <div class="s-val" id="rank-streak-best">0</div>
+              <div class="s-lbl">Recorde</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="settings-section">
-      <h3>Dados</h3>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Limpar Histórico</div>
-          <div class="setting-sub">Remove todas as sessões salvas</div>
+  </section>
+
+  <!-- ═══════════════ CONFIG ═══════════════ -->
+  <section class="page" id="configuracoes" aria-label="Configurações">
+
+    <div class="settings-wrap">
+      <div class="page-title" style="margin-bottom:.5rem;">⚙ Configurações</div>
+
+      <!-- Aparência -->
+      <div class="settings-group">
+        <span class="settings-group-label">Aparência</span>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Tema Claro</div><div class="setting-sub">Alterna entre dark e light</div></div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-theme" onchange="Settings.apply()">
+            <div class="toggle-track"></div>
+          </label>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="clearHistory()">Limpar</button>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Tamanho da Fonte</div><div class="setting-sub" id="font-size-lbl">16px</div></div>
+          <input type="range" class="s-range" id="font-size" min="13" max="22" value="16" oninput="Settings.apply()">
+        </div>
       </div>
+
+      <!-- Experiência -->
+      <div class="settings-group">
+        <span class="settings-group-label">Experiência</span>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Sons de Tecla</div><div class="setting-sub">Feedback sonoro ao digitar</div></div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-sound" onchange="Settings.apply()">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Dificuldade das Frases</div></div>
+          <select class="s-select" id="difficulty" onchange="Settings.apply()">
+            <option value="easy">Fácil</option>
+            <option value="medium" selected>Médio</option>
+            <option value="hard">Difícil</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Modo de Texto</div></div>
+          <select class="s-select" id="text-mode" onchange="Settings.apply()">
+            <option value="phrases">Frases</option>
+            <option value="code">Código</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div><div class="setting-label">Idioma das Frases</div></div>
+          <select class="s-select" id="language" onchange="Settings.apply()">
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Layout do Teclado</div>
+            <div class="setting-sub" id="layout-detected">Auto-detectado na digitação</div>
+          </div>
+          <select class="s-select" id="kb-layout" onchange="Settings.apply()">
+            <option value="qwerty">QWERTY</option>
+            <option value="abnt2">ABNT2</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PWA -->
+      <div class="settings-group">
+        <span class="settings-group-label">App</span>
+        <div class="setting-row">
+          <div><div class="setting-label">Instalar como App</div><div class="setting-sub">Funciona offline após instalação</div></div>
+          <button class="btn btn-secondary btn-sm hidden" id="pwa-install-btn" onclick="Settings.installPWA()">Instalar</button>
+        </div>
+      </div>
+
+      <!-- Dados -->
+      <div class="settings-group">
+        <span class="settings-group-label">Dados</span>
+        <div class="setting-row">
+          <div><div class="setting-label">Limpar Histórico</div><div class="setting-sub">Remove sessões e heatmap</div></div>
+          <button class="btn btn-danger btn-sm" onclick="Settings.clearSessions()">Limpar</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Resetar Tudo</div><div class="setting-sub">Apaga streak, ranking e todo histórico</div></div>
+          <button class="btn btn-danger btn-sm" onclick="Settings.resetAll()">Reset</button>
+        </div>
+      </div>
+
     </div>
-  </div>
-</section>
+
+  </section>
 
 </div><!-- .app -->
-
-<script>
-// ═══════════════════════════════════════════════
-//  DATA
-// ═══════════════════════════════════════════════
-const PHRASES = {
-  pt: {
-    easy: [
-      "o gato dorme",
-      "o sol brilha hoje",
-      "a casa é bonita",
-      "eu gosto de café",
-      "o dia está lindo",
-      "preciso estudar mais",
-      "a lua apareceu cedo",
-      "o vento é suave",
-      "gosto de aprender",
-      "o pão está quente"
-    ],
-    medium: [
-      "a digitação rápida exige prática constante",
-      "treinamento melhora a velocidade e precisão",
-      "pratique todos os dias para evoluir",
-      "o computador é uma ferramenta poderosa",
-      "aprender a digitar bem abre portas",
-      "foco e consistência geram resultados",
-      "cada sessão de treino conta muito",
-      "a velocidade vem com o tempo e dedicação",
-      "erros fazem parte do aprendizado natural",
-      "mantenha os dedos na linha base sempre"
-    ],
-    hard: [
-      "a prática deliberada e consistente é o caminho mais eficiente para desenvolver habilidades complexas de digitação",
-      "programadores experientes digitam mais de oitenta palavras por minuto com alta precisão e poucos erros",
-      "o método de digitação com todos os dedos reduz a fadiga e aumenta significativamente a velocidade final",
-      "exercícios regulares de coordenação motora fina ajudam a construir memória muscular para as teclas do teclado",
-      "manter uma postura adequada durante a digitação previne lesões por esforço repetitivo no longo prazo"
-    ]
-  },
-  en: {
-    easy: [
-      "the cat sleeps",
-      "the sun shines today",
-      "I like coffee",
-      "the day is nice",
-      "good morning",
-      "the wind is soft",
-      "I love learning",
-      "the bread is warm",
-      "have a great day",
-      "keep it up"
-    ],
-    medium: [
-      "practice makes perfect every single day",
-      "typing fast requires constant dedication",
-      "focus and consistency deliver results",
-      "every training session counts a lot",
-      "errors are part of the learning process",
-      "keep your fingers on the home row keys",
-      "speed comes with time and hard work",
-      "learning to type well opens many doors",
-      "a clean desk helps your productivity",
-      "deliberate practice builds muscle memory"
-    ],
-    hard: [
-      "consistent deliberate practice is the most efficient path to developing complex typing skills over time",
-      "experienced programmers type more than eighty words per minute with high accuracy and very few mistakes",
-      "the touch typing method using all fingers reduces fatigue and significantly increases overall typing speed",
-      "regular fine motor coordination exercises help build muscle memory for every key on the keyboard layout",
-      "maintaining proper posture while typing prevents repetitive strain injuries over the long term career"
-    ]
-  }
-};
-
-const LESSONS = [
-  { name: "Linha Base", desc: "As 8 teclas centrais", keys: "A S D F J K L ;", chars: "asdfjkl;", sequence: "asdf jkl; asdf jkl; fj fk fl f; dj dk dl d; sj sk sl s; aj ak al a;" },
-  { name: "Expansão E/I", desc: "Adicionando E e I", keys: "A S D E F J I K L ;", chars: "asdfejkli;", sequence: "fj fk ei ei asdf jkl; eid fia elk jes fid jel ask" },
-  { name: "G e H", desc: "Teclas centrais G e H", keys: "G H", chars: "gh", sequence: "gh hg fg jh gf hj fgh jhk asdf gh jkl; hag had" },
-  { name: "T e Y", desc: "Fila superior T e Y", keys: "T Y", chars: "ty", sequence: "ty yt ft jy gt hy try yet stay they type year" },
-  { name: "R e U", desc: "Fila superior R e U", keys: "R U", chars: "ru", sequence: "ru ur fr ju dr ku rut run use fur rule true" },
-  { name: "W e O", desc: "Fila superior W e O", keys: "W O", chars: "wo", sequence: "wo ow fw ko dw lo word know flow glow work grow" },
-  { name: "Q e P", desc: "Cantos superiores Q e P", keys: "Q P", chars: "qp", sequence: "qp pq qf jp qd lp quite place quick poem port" },
-  { name: "Z, X, C, V", desc: "Fila inferior", keys: "Z X C V", chars: "zxcv", sequence: "zx cv xz vc zap cap vex zero cave text flex vice" },
-  { name: "B e N", desc: "Fila inferior B e N", keys: "B N M", chars: "bnm", sequence: "bn nm bm nb man bin van name bone moon mind" },
-  { name: "Pontuação", desc: "Vírgula, ponto e espaço", keys: ", . /", chars: ",./ ", sequence: "a, s. d, f. j, k. l. one, two. three, four. end." }
-];
-
-const KB_LAYOUT = [
-  ["Q","W","E","R","T","Y","U","I","O","P"],
-  ["A","S","D","F","G","H","J","K","L",";"],
-  ["Z","X","C","V","B","N","M",",",".","/"]
-];
-
-// ═══════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════
-let settings = {
-  dark: true,
-  fontSize: 16,
-  sound: false,
-  difficulty: 'medium',
-  language: 'pt',
-  contrast: false
-};
-
-let practiceState = {
-  phrase: '',
-  typed: '',
-  started: false,
-  finished: false,
-  startTime: null,
-  timer: null,
-  errors: 0,
-  totalTyped: 0,
-  currentPhrase: null
-};
-
-let trainState = {
-  lesson: 0,
-  phrase: '',
-  typed: '',
-  correct: 0,
-  total: 0
-};
-
-let storage = {
-  sessions: [],
-  lessonProgress: []
-};
-
-// ═══════════════════════════════════════════════
-//  STORAGE
-// ═══════════════════════════════════════════════
-function loadStorage() {
-  try {
-    const s = localStorage.getItem('tm_settings');
-    if (s) settings = { ...settings, ...JSON.parse(s) };
-    const d = localStorage.getItem('tm_data');
-    if (d) storage = { ...storage, ...JSON.parse(d) };
-  } catch(e) {}
-}
-
-function saveStorage() {
-  try {
-    localStorage.setItem('tm_settings', JSON.stringify(settings));
-    localStorage.setItem('tm_data', JSON.stringify(storage));
-  } catch(e) {}
-}
-
-function addSession(wpm, acc, time) {
-  storage.sessions.unshift({
-    wpm, acc, time,
-    date: new Date().toLocaleDateString('pt-BR')
-  });
-  if (storage.sessions.length > 20) storage.sessions.pop();
-  saveStorage();
-}
-
-function clearHistory() {
-  storage.sessions = [];
-  saveStorage();
-  updateHomeStats();
-  showToast('Histórico apagado');
-}
-
-// ═══════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelector(`[data-page="${id}"]`)?.classList.add('active');
-
-  if (id === 'home') updateHomeStats();
-  if (id === 'pratica') initPractice();
-  if (id === 'treino') initTraining();
-  if (id === 'configuracoes') loadSettingsUI();
-}
-
-// ═══════════════════════════════════════════════
-//  HOME
-// ═══════════════════════════════════════════════
-function updateHomeStats() {
-  const sessions = storage.sessions;
-  const bestWPM = sessions.length ? Math.max(...sessions.map(s => s.wpm)) : null;
-  const avgAcc = sessions.length ? Math.round(sessions.reduce((a,s) => a + s.acc, 0) / sessions.length) : null;
-
-  document.getElementById('home-best-wpm').textContent = bestWPM ? bestWPM : '—';
-  document.getElementById('home-avg-acc').textContent = avgAcc ? avgAcc + '%' : '—';
-  document.getElementById('home-sessions').textContent = sessions.length;
-
-  const list = document.getElementById('history-list');
-  if (!sessions.length) {
-    list.innerHTML = '<div class="empty-state">Nenhuma sessão ainda. Comece a praticar!</div>';
-    return;
-  }
-  list.innerHTML = sessions.slice(0, 8).map(s => `
-    <div class="history-item">
-      <span>${s.date}</span>
-      <span class="wpm">${s.wpm} WPM</span>
-      <span>${s.acc}% precisão</span>
-      <span>${s.time}s</span>
-    </div>
-  `).join('');
-}
-
-// ═══════════════════════════════════════════════
-//  PRACTICE
-// ═══════════════════════════════════════════════
-function getPhrasePhrases() {
-  const diff = settings.difficulty;
-  const lang = settings.language;
-  return PHRASES[lang][diff] || PHRASES.pt.medium;
-}
-
-function initPractice() {
-  stopPracticeTimer();
-  practiceState = { phrase:'', typed:'', started:false, finished:false, startTime:null, timer:null, errors:0, totalTyped:0, currentPhrase:null };
-  document.getElementById('results-panel').classList.add('hidden');
-  document.getElementById('typing-input').value = '';
-  resetMetrics();
-  loadNewPhrase();
-  document.getElementById('typing-input').focus();
-}
-
-function loadNewPhrase() {
-  const phrases = getPhrasePhrases();
-  let idx;
-  do { idx = Math.floor(Math.random() * phrases.length); } while(phrases[idx] === practiceState.currentPhrase && phrases.length > 1);
-  practiceState.currentPhrase = phrases[idx];
-  practiceState.phrase = phrases[idx];
-  practiceState.typed = '';
-  practiceState.errors = 0;
-  practiceState.totalTyped = 0;
-  renderPhrase();
-}
-
-function renderPhrase() {
-  const phrase = practiceState.phrase;
-  const typed = practiceState.typed;
-  const display = document.getElementById('phrase-display');
-  let html = '';
-  for (let i = 0; i < phrase.length; i++) {
-    let cls = '';
-    if (i < typed.length) {
-      cls = typed[i] === phrase[i] ? 'correct' : 'incorrect';
-    } else if (i === typed.length) {
-      cls = 'current';
-    }
-    const ch = phrase[i] === ' ' ? '&nbsp;' : phrase[i];
-    html += `<span class="char ${cls}">${ch}</span>`;
-  }
-  display.innerHTML = html;
-
-  // Progress
-  const prog = Math.round((typed.length / phrase.length) * 100);
-  document.getElementById('practice-progress').style.width = prog + '%';
-}
-
-function handlePracticeInput(e) {
-  if (practiceState.finished) return;
-  const val = e.target.value;
-  const phrase = practiceState.phrase;
-
-  // Start timer on first key
-  if (!practiceState.started && val.length > 0) {
-    practiceState.started = true;
-    practiceState.startTime = Date.now();
-    startPracticeTimer();
-  }
-
-  // Track errors
-  if (val.length > practiceState.typed.length) {
-    const newChar = val[val.length - 1];
-    const expected = phrase[val.length - 1];
-    practiceState.totalTyped++;
-    if (newChar !== expected) {
-      practiceState.errors++;
-      playErrorSound();
-    } else {
-      playKeySound();
-    }
-  }
-
-  practiceState.typed = val;
-  renderPhrase();
-  updateMetrics();
-
-  // Check completion
-  if (val === phrase) {
-    finishPractice();
-  }
-
-  // Don't allow typing beyond phrase
-  if (val.length >= phrase.length && val !== phrase) {
-    e.target.value = val.slice(0, phrase.length);
-    practiceState.typed = e.target.value;
-    renderPhrase();
-  }
-}
-
-function startPracticeTimer() {
-  practiceState.timer = setInterval(updateMetrics, 200);
-}
-
-function stopPracticeTimer() {
-  if (practiceState.timer) clearInterval(practiceState.timer);
-}
-
-function updateMetrics() {
-  if (!practiceState.started) return;
-  const elapsed = (Date.now() - practiceState.startTime) / 1000;
-  const minutes = elapsed / 60;
-  const wpm = minutes > 0 ? Math.round((practiceState.typed.length / 5) / minutes) : 0;
-  const acc = practiceState.totalTyped > 0
-    ? Math.round(((practiceState.totalTyped - practiceState.errors) / practiceState.totalTyped) * 100)
-    : 100;
-
-  document.getElementById('m-wpm').textContent = wpm;
-  document.getElementById('m-acc').textContent = acc + '%';
-  document.getElementById('m-time').textContent = Math.round(elapsed) + 's';
-  document.getElementById('m-chars').textContent = practiceState.typed.length;
-}
-
-function resetMetrics() {
-  document.getElementById('m-wpm').textContent = '0';
-  document.getElementById('m-acc').textContent = '100%';
-  document.getElementById('m-time').textContent = '0s';
-  document.getElementById('m-chars').textContent = '0';
-  document.getElementById('practice-progress').style.width = '0%';
-}
-
-function finishPractice() {
-  stopPracticeTimer();
-  practiceState.finished = true;
-  const elapsed = Math.round((Date.now() - practiceState.startTime) / 1000);
-  const minutes = elapsed / 60;
-  const wpm = minutes > 0 ? Math.round((practiceState.phrase.length / 5) / minutes) : 0;
-  const acc = practiceState.totalTyped > 0
-    ? Math.round(((practiceState.totalTyped - practiceState.errors) / practiceState.totalTyped) * 100)
-    : 100;
-
-  // Show results
-  document.getElementById('r-wpm').textContent = wpm;
-  document.getElementById('r-acc').textContent = acc + '%';
-  document.getElementById('r-time').textContent = elapsed + 's';
-
-  let msg = '';
-  if (wpm >= 60 && acc >= 95) msg = '🏆 Excelente! Performance profissional!';
-  else if (wpm >= 40) msg = '⭐ Muito bom! Continue evoluindo!';
-  else if (wpm >= 20) msg = '👍 Bom progresso! Pratique mais!';
-  else msg = '💪 Continue praticando, você vai melhorar!';
-  document.getElementById('result-msg').textContent = msg;
-  document.getElementById('results-panel').classList.remove('hidden');
-
-  addSession(wpm, acc, elapsed);
-}
-
-function restartPractice() {
-  stopPracticeTimer();
-  document.getElementById('results-panel').classList.add('hidden');
-  document.getElementById('typing-input').value = '';
-  practiceState = { ...practiceState, typed:'', started:false, finished:false, startTime:null, timer:null, errors:0, totalTyped:0 };
-  resetMetrics();
-  renderPhrase();
-  document.getElementById('typing-input').focus();
-}
-
-function nextPhrase() {
-  stopPracticeTimer();
-  document.getElementById('results-panel').classList.add('hidden');
-  document.getElementById('typing-input').value = '';
-  practiceState = { phrase:'', typed:'', started:false, finished:false, startTime:null, timer:null, errors:0, totalTyped:0, currentPhrase: practiceState.currentPhrase };
-  resetMetrics();
-  startCountdown(() => {
-    loadNewPhrase();
-    document.getElementById('typing-input').focus();
-  });
-}
-
-function focusInput() {
-  document.getElementById('typing-input').focus();
-}
-
-// ═══════════════════════════════════════════════
-//  TRAINING
-// ═══════════════════════════════════════════════
-function buildKeyboard() {
-  const kb = document.getElementById('keyboard');
-  kb.innerHTML = '';
-
-  KB_LAYOUT.forEach((row, ri) => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'kb-row';
-
-    if (ri === 1) {
-      const cap = document.createElement('div');
-      cap.className = 'key wider';
-      cap.textContent = 'Caps';
-      rowEl.appendChild(cap);
-    }
-    if (ri === 2) {
-      const shift = document.createElement('div');
-      shift.className = 'key wider';
-      shift.textContent = 'Shift';
-      rowEl.appendChild(shift);
-    }
-
-    row.forEach(k => {
-      const keyEl = document.createElement('div');
-      keyEl.className = 'key';
-      keyEl.id = 'key-' + k.toLowerCase().replace(';','semicolon').replace(',','comma').replace('.','period').replace('/','slash');
-      keyEl.textContent = k;
-      rowEl.appendChild(keyEl);
-    });
-
-    if (ri === 0) {
-      const bs = document.createElement('div');
-      bs.className = 'key wider';
-      bs.textContent = '⌫';
-      rowEl.appendChild(bs);
-    }
-    if (ri === 1) {
-      const enter = document.createElement('div');
-      enter.className = 'key wide';
-      enter.textContent = 'Enter';
-      rowEl.appendChild(enter);
-    }
-    if (ri === 2) {
-      const shiftR = document.createElement('div');
-      shiftR.className = 'key wider';
-      shiftR.textContent = 'Shift';
-      rowEl.appendChild(shiftR);
-    }
-
-    kb.appendChild(rowEl);
-  });
-
-  // Space bar row
-  const spRow = document.createElement('div');
-  spRow.className = 'kb-row';
-  const space = document.createElement('div');
-  space.className = 'key space';
-  space.id = 'key-space';
-  space.textContent = 'Espaço';
-  spRow.appendChild(space);
-  kb.appendChild(spRow);
-}
-
-function highlightLesson() {
-  const lesson = LESSONS[trainState.lesson];
-  // Reset all
-  document.querySelectorAll('.key').forEach(k => {
-    k.classList.remove('target','learned');
-  });
-
-  // Mark learned keys (previous lessons)
-  for (let i = 0; i < trainState.lesson; i++) {
-    LESSONS[i].chars.split('').forEach(c => highlightKey(c, 'learned'));
-  }
-
-  // Mark current lesson keys
-  lesson.chars.split('').forEach(c => highlightKey(c, 'target'));
-}
-
-function highlightKey(char, cls) {
-  const map = {' ':'space',';':'semicolon',',':'comma','.':'period','/':'slash'};
-  const id = 'key-' + (map[char] || char.toLowerCase());
-  const el = document.getElementById(id);
-  if (el) el.classList.add(cls);
-}
-
-function flashKey(char, cls) {
-  const map = {' ':'space',';':'semicolon',',':'comma','.':'period','/':'slash'};
-  const id = 'key-' + (map[char] || char.toLowerCase());
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add(cls);
-  setTimeout(() => el.classList.remove(cls), 300);
-}
-
-function generateTrainPhrase() {
-  const lesson = LESSONS[trainState.lesson];
-  const words = lesson.sequence.split(' ');
-  // Pick 8 random words from sequence
-  let result = [];
-  for (let i = 0; i < 8; i++) {
-    result.push(words[Math.floor(Math.random() * words.length)]);
-  }
-  return result.join(' ');
-}
-
-function initTraining() {
-  buildKeyboard();
-  loadLesson();
-}
-
-function loadLesson() {
-  const lesson = LESSONS[trainState.lesson];
-  document.getElementById('lesson-name').textContent = `Lição ${trainState.lesson + 1} — ${lesson.name}`;
-  document.getElementById('lesson-desc').textContent = lesson.desc;
-  document.getElementById('lesson-keys').textContent = lesson.keys;
-
-  // Progress dots
-  const prog = document.getElementById('lesson-progress');
-  prog.innerHTML = LESSONS.map((_, i) => {
-    let cls = 'lesson-dot';
-    if (i < trainState.lesson) cls += ' done';
-    else if (i === trainState.lesson) cls += ' current';
-    return `<div class="${cls}"></div>`;
-  }).join('');
-
-  // Prev/next buttons
-  document.getElementById('btn-prev-lesson').disabled = trainState.lesson === 0;
-  document.getElementById('btn-next-lesson').disabled = trainState.lesson === LESSONS.length - 1;
-
-  trainState.phrase = generateTrainPhrase();
-  trainState.typed = '';
-  trainState.correct = 0;
-  trainState.total = 0;
-
-  highlightLesson();
-  renderTrainPhrase();
-  document.getElementById('train-score').textContent = '';
-  document.getElementById('train-input').value = '';
-  document.getElementById('train-input').focus();
-}
-
-function renderTrainPhrase() {
-  const phrase = trainState.phrase;
-  const typed = trainState.typed;
-  let html = '';
-  for (let i = 0; i < phrase.length; i++) {
-    let cls = '';
-    if (i < typed.length) {
-      cls = typed[i] === phrase[i] ? 'correct' : 'incorrect';
-    } else if (i === typed.length) {
-      cls = 'current';
-    }
-    const ch = phrase[i] === ' ' ? '&nbsp;' : phrase[i];
-    html += `<span class="char ${cls}">${ch}</span>`;
-  }
-  document.getElementById('train-display').innerHTML = html;
-  const prog = Math.round((typed.length / phrase.length) * 100);
-  document.getElementById('train-progress').style.width = prog + '%';
-}
-
-function handleTrainInput(e) {
-  const val = e.target.value;
-  const phrase = trainState.phrase;
-
-  if (val.length > trainState.typed.length) {
-    const newChar = val[val.length - 1];
-    const expected = phrase[val.length - 1];
-    trainState.total++;
-    if (newChar === expected) {
-      trainState.correct++;
-      flashKey(newChar, 'highlight-green');
-      playKeySound();
-    } else {
-      flashKey(expected, 'highlight-red');
-      playErrorSound();
-    }
-  }
-
-  trainState.typed = val;
-  renderTrainPhrase();
-
-  // Completed
-  if (val.length >= phrase.length) {
-    const acc = Math.round((trainState.correct / trainState.total) * 100);
-    document.getElementById('train-score').textContent = `✓ ${acc}% precisão`;
-    showToast(`Lição concluída! ${acc}% de precisão`);
-    // Mark progress
-    if (!storage.lessonProgress.includes(trainState.lesson)) {
-      storage.lessonProgress.push(trainState.lesson);
-      saveStorage();
-    }
-    setTimeout(() => {
-      if (trainState.lesson < LESSONS.length - 1 && acc >= 80) {
-        trainState.lesson++;
-        loadLesson();
-      }
-    }, 1500);
-  }
-}
-
-function restartLesson() { loadLesson(); }
-
-function prevLesson() {
-  if (trainState.lesson > 0) { trainState.lesson--; loadLesson(); }
-}
-function nextLesson() {
-  if (trainState.lesson < LESSONS.length - 1) { trainState.lesson++; loadLesson(); }
-}
-
-function focusTrainInput() {
-  document.getElementById('train-input').focus();
-}
-
-// ═══════════════════════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════════════════════
-function loadSettingsUI() {
-  document.getElementById('toggle-theme').checked = !settings.dark;
-  document.getElementById('font-size').value = settings.fontSize;
-  document.getElementById('toggle-sound').checked = settings.sound;
-  document.getElementById('difficulty').value = settings.difficulty;
-  document.getElementById('language').value = settings.language;
-  document.getElementById('toggle-contrast').checked = settings.contrast;
-}
-
-function applySettings() {
-  settings.dark = !document.getElementById('toggle-theme').checked;
-  settings.fontSize = parseInt(document.getElementById('font-size').value);
-  settings.sound = document.getElementById('toggle-sound').checked;
-  settings.difficulty = document.getElementById('difficulty').value;
-  settings.language = document.getElementById('language').value;
-  settings.contrast = document.getElementById('toggle-contrast').checked;
-
-  document.documentElement.setAttribute('data-theme', settings.dark ? 'dark' : 'light');
-  document.documentElement.style.setProperty('--fs', settings.fontSize + 'px');
-
-  if (settings.contrast) {
-    document.documentElement.style.setProperty('--text', settings.dark ? '#ffffff' : '#000000');
-    document.documentElement.style.setProperty('--text2', settings.dark ? '#cccccc' : '#222222');
-  } else {
-    document.documentElement.style.removeProperty('--text');
-    document.documentElement.style.removeProperty('--text2');
-  }
-
-  saveStorage();
-}
-
-// ═══════════════════════════════════════════════
-//  SOUNDS
-// ═══════════════════════════════════════════════
-let audioCtx = null;
-
-function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-
-function playKeySound() {
-  if (!settings.sound) return;
-  try {
-    const ctx = getAudio();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'square';
-    osc.frequency.value = 800;
-    gain.gain.setValueAtTime(0.05, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    osc.start(); osc.stop(ctx.currentTime + 0.05);
-  } catch(e) {}
-}
-
-function playErrorSound() {
-  if (!settings.sound) return;
-  try {
-    const ctx = getAudio();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sawtooth';
-    osc.frequency.value = 200;
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-    osc.start(); osc.stop(ctx.currentTime + 0.12);
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════
-//  COUNTDOWN
-// ═══════════════════════════════════════════════
-function startCountdown(cb) {
-  const overlay = document.getElementById('countdown-overlay');
-  const num = document.getElementById('countdown-num');
-  overlay.classList.remove('hidden');
-  let n = 3;
-  num.textContent = n;
-
-  const tick = () => {
-    n--;
-    if (n <= 0) {
-      overlay.classList.add('hidden');
-      cb();
-    } else {
-      num.textContent = n;
-      num.style.animation = 'none';
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { num.style.animation = 'countPop 1s ease-out'; });
-      });
-      setTimeout(tick, 1000);
-    }
-  };
-  setTimeout(tick, 1000);
-}
-
-// ═══════════════════════════════════════════════
-//  FOCUS MODE
-// ═══════════════════════════════════════════════
-let focusMode = false;
-function toggleFocus() {
-  focusMode = !focusMode;
-  document.body.classList.toggle('focus-mode', focusMode);
-  document.getElementById('focus-btn').textContent = focusMode ? '✕ Foco' : 'Foco';
-  showToast(focusMode ? 'Modo foco ativado' : 'Modo foco desativado');
-}
-
-// ═══════════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════════
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ═══════════════════════════════════════════════
-//  EVENT LISTENERS
-// ═══════════════════════════════════════════════
-document.getElementById('typing-input').addEventListener('input', handlePracticeInput);
-document.getElementById('train-input').addEventListener('input', handleTrainInput);
-
-// Keyboard shortcut: click anywhere in practice to focus
-document.getElementById('pratica').addEventListener('click', (e) => {
-  if (!e.target.closest('.btn') && !e.target.closest('.results-panel')) {
-    focusInput();
-  }
-});
-
-// Prevent losing focus on practice page
-document.addEventListener('keydown', (e) => {
-  const activePage = document.querySelector('.page.active');
-  if (!activePage) return;
-  if (activePage.id === 'pratica' && !practiceState.finished) {
-    focusInput();
-  }
-});
-
-// ═══════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════
-function init() {
-  loadStorage();
-  // Apply saved settings
-  document.documentElement.setAttribute('data-theme', settings.dark ? 'dark' : 'light');
-  document.documentElement.style.setProperty('--fs', settings.fontSize + 'px');
-  updateHomeStats();
-}
-
-init();
-</script>
 </body>
 </html>

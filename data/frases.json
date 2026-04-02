@@ -1,0 +1,76 @@
+{
+  "pt": {
+    "easy": [
+      "o gato dorme ao sol",
+      "a casa é muito bonita",
+      "eu gosto de café forte",
+      "o dia está muito lindo",
+      "a lua nasceu cedo hoje",
+      "o vento é suave e frio",
+      "gosto muito de aprender",
+      "o pão está bem quente",
+      "o livro é muito bom",
+      "a água está bem fria",
+      "o carro é bem rápido",
+      "a flor é muito linda"
+    ],
+    "medium": [
+      "a digitação rápida exige prática constante e dedicação",
+      "treinamento diário melhora a velocidade e a precisão",
+      "pratique todos os dias para evoluir cada vez mais",
+      "o computador é uma ferramenta muito poderosa e útil",
+      "aprender a digitar bem abre muitas portas na carreira",
+      "foco e consistência sempre geram resultados expressivos",
+      "cada sessão de treino conta muito para o seu progresso",
+      "a velocidade vem com o tempo e com dedicação diária",
+      "erros fazem parte do aprendizado natural de cada pessoa",
+      "mantenha os dedos na linha base sempre que for possível",
+      "desenvolver ritmo é tão importante quanto a velocidade",
+      "respire fundo e continue digitando sem se distrair"
+    ],
+    "hard": [
+      "a prática deliberada e consistente é o caminho mais eficiente para desenvolver habilidades complexas de digitação profissional",
+      "programadores experientes digitam mais de oitenta palavras por minuto com alta precisão e poucos erros ao longo do dia",
+      "o método de digitação com todos os dez dedos reduz significativamente a fadiga e aumenta a velocidade de forma expressiva",
+      "exercícios regulares de coordenação motora fina ajudam a construir memória muscular sólida para todas as teclas do teclado",
+      "manter uma postura adequada durante longas sessões de digitação previne lesões por esforço repetitivo no longo prazo"
+    ]
+  },
+  "en": {
+    "easy": [
+      "the cat sleeps in the sun",
+      "I really like hot coffee",
+      "the day is very beautiful",
+      "the wind is soft and cool",
+      "I love to learn new things",
+      "the bread is warm today",
+      "the book is very good",
+      "have a wonderful day",
+      "keep up the great work",
+      "the car drives very fast",
+      "the flower is so pretty",
+      "water is cold and fresh"
+    ],
+    "medium": [
+      "practice makes perfect every single day without exception",
+      "typing fast requires constant dedication and hard work",
+      "focus and consistency always deliver outstanding results",
+      "every training session counts a lot for your progress",
+      "errors are a natural part of the learning process always",
+      "keep your fingers resting on the home row keys always",
+      "speed always comes with time and consistent practice",
+      "learning to type well opens many professional doors",
+      "a calm mind and clean desk help your productivity",
+      "deliberate practice builds lasting and strong muscle memory",
+      "developing rhythm matters just as much as raw speed",
+      "breathe deeply and keep typing without any distraction"
+    ],
+    "hard": [
+      "consistent deliberate practice is the most efficient path to developing complex typing skills that last and improve over time",
+      "experienced programmers type more than eighty words per minute with high accuracy and very few mistakes throughout the day",
+      "the touch typing method using all ten fingers reduces fatigue and significantly increases overall typing speed each and every day",
+      "regular fine motor coordination exercises help build robust muscle memory for every single key on the keyboard layout permanently",
+      "maintaining proper posture while typing for long hours prevents repetitive strain injuries over the course of a long and productive career"
+    ]
+  }
+}
