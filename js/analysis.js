@@ -11,7 +11,7 @@ import { AppData } from './app.js';
 ───────────────────────────────────────── */
 
 export function init() {
-  UI.buildKeyboard('analysis-keyboard', '');
+  UI.buildKeyboard('analysis-keyboard', '', AppData.settings.layout || 'qwerty');
   UI.applyHeatmapToContainer('analysis-keyboard', AppData.keyboard);
   renderProblemKeys();
   renderSessionChart();

@@ -9,6 +9,7 @@ import * as Practice from './practice.js';
 import * as Training from './training.js';
 import * as Analysis from './analysis.js';
 import * as Settings from './settings.js';
+import * as KBL      from './keyboard-layout.js';
 
 /* ─────────────────────────────────────────
    ESTADO GLOBAL COMPARTILHADO
@@ -199,6 +200,16 @@ function boot() {
   updateHome();
   registerSW();
 
+  // Start layout detection globally from boot —
+  // so it works even if user never visits Settings page
+  KBL.startDetection();
+  KBL.onLayoutDetected((layout, source) => {
+    if (source === 'auto') {
+      AppData.settings.layout = layout;
+      Storage.save(AppData);
+    }
+  });
+
   // Handle deep links via hash
   const hash = window.location.hash.slice(1);
   if (hash && PAGE_INITS[hash]) navigate(hash);
@@ -238,6 +249,7 @@ window.Training = {
 
 window.Settings = {
   apply:         () => Settings.apply(),
+  applyLayout:   () => Settings.applyLayout(),
   clearSessions: () => Settings.clearSessions(),
   resetAll:      () => Settings.resetAll(),
   installPWA:    () => Settings.installPWA()

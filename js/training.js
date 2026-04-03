@@ -42,7 +42,7 @@ const KEY_PREFIX = 'kp-';
 ───────────────────────────────────────── */
 
 export function init() {
-  UI.buildKeyboard('keyboard', KEY_PREFIX);
+  UI.buildKeyboard('keyboard', KEY_PREFIX, AppData.settings.layout || 'qwerty');
   loadLesson();
 }
 

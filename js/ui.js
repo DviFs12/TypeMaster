@@ -9,14 +9,39 @@ const CHAR_MAP = {
   ',': 'comma',
   '.': 'period',
   '/': 'slash',
-  ' ': 'space'
+  ' ': 'space',
+  "'":'quote',
+  'ç': 'cedilla',
+  'Ç': 'cedilla',
+  '´': 'acute',
+  '~': 'tilde',
+  '[': 'bracket-left',
+  ']': 'bracket-right',
 };
 
+/* Default QWERTY rows — used as fallback */
 const KB_ROWS = [
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L',';'],
   ['Z','X','C','V','B','N','M',',','.','/']
 ];
+
+/* Layout-specific rows (imported lazily to avoid circular deps) */
+let _layoutDefs = null;
+async function getLayoutDefs() {
+  if (_layoutDefs) return _layoutDefs;
+  try {
+    const mod = await import('./keyboard-layout.js');
+    _layoutDefs = mod.LAYOUT_DEFS;
+  } catch {
+    _layoutDefs = {};
+  }
+  return _layoutDefs;
+}
+
+// Synchronous version for keyboard building (resolved after first async call)
+let _layoutDefsSync = null;
+import('./keyboard-layout.js').then(mod => { _layoutDefsSync = mod.LAYOUT_DEFS; }).catch(() => {});
 
 let toastTimer = null;
 
@@ -115,15 +140,19 @@ export function setProgress(id, pct, complete = false) {
 
 /**
  * Build a virtual keyboard into a container.
- * @param {string} containerId
- * @param {string} keyIdPrefix - prefix for key IDs (e.g. 'kp-', 'ak-', '')
+ * @param {string}  containerId
+ * @param {string}  keyIdPrefix - prefix for key IDs (e.g. 'kp-', '')
+ * @param {string}  layout      - 'qwerty' | 'abnt2' (default: 'qwerty')
  */
-export function buildKeyboard(containerId, keyIdPrefix = '') {
+export function buildKeyboard(containerId, keyIdPrefix = '', layout = 'qwerty') {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
 
-  KB_ROWS.forEach((row, ri) => {
+  // Pick rows: use layout-specific rows if available, else fallback to QWERTY
+  const rows = _layoutDefsSync?.[layout]?.rows ?? KB_ROWS;
+
+  rows.forEach((row, ri) => {
     const rowEl = document.createElement('div');
     rowEl.className = 'kb-row';
 
@@ -131,21 +160,22 @@ export function buildKeyboard(containerId, keyIdPrefix = '') {
     if (ri === 2) rowEl.appendChild(makeKey('Shift', 'wider util'));
 
     row.forEach(k => {
-      const rawChar = k.toLowerCase();
-      const char    = CHAR_MAP[rawChar] ?? rawChar;
-      const keyEl   = makeKey(k, '');
+      const rawChar  = k.toLowerCase();
+      const idSuffix = CHAR_MAP[rawChar] ?? rawChar;
+      const keyEl    = makeKey(k, '');
       keyEl.dataset.char = rawChar;
-      if (keyIdPrefix) keyEl.id = keyIdPrefix + (CHAR_MAP[rawChar] || rawChar);
+      if (keyIdPrefix) keyEl.id = keyIdPrefix + idSuffix;
       rowEl.appendChild(keyEl);
     });
 
-    if (ri === 0) rowEl.appendChild(makeKey('⌫',     'wider util'));
-    if (ri === 1) rowEl.appendChild(makeKey('↵',     'wide util'));
-    if (ri === 2) rowEl.appendChild(makeKey('⇧',     'wider util'));
+    if (ri === 0) rowEl.appendChild(makeKey('⌫', 'wider util'));
+    if (ri === 1) rowEl.appendChild(makeKey('↵', 'wide util'));
+    if (ri === 2) rowEl.appendChild(makeKey('⇧', 'wider util'));
 
     container.appendChild(rowEl);
   });
 
+  // Space bar row
   const spaceRow = document.createElement('div');
   spaceRow.className = 'kb-row';
   const spaceKey = makeKey('Espaço', 'space');
@@ -162,9 +192,13 @@ function makeKey(label, extraClass) {
   return el;
 }
 
-/** Flash a key element with hit or error animation */
+/**
+ * Flash a key element with hit or error animation.
+ * Handles ABNT2 chars (ç → cedilla, ã → quote, etc.)
+ */
 export function flashKey(keyIdPrefix, char, type) {
-  const mapped = CHAR_MAP[char] ?? char.toLowerCase();
+  const lc     = char.toLowerCase();
+  const mapped = CHAR_MAP[lc] ?? lc;
   const id     = keyIdPrefix + mapped;
   const el     = document.getElementById(id);
   if (!el) return;

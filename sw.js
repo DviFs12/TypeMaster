@@ -2,7 +2,7 @@
    TypeMaster — Service Worker
    Caches all assets for offline use
 ═══════════════════════════════════════════ */
-const CACHE_NAME  = 'typemaster-v3';
+const CACHE_NAME  = 'typemaster-v4';
 const CACHE_URLS  = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const CACHE_URLS  = [
   './js/ui.js',
   './js/analysis.js',
   './js/settings.js',
+  './js/keyboard-layout.js',
   './data/frases.json',
   './data/code.json',
   './manifest.json',

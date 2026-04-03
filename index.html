@@ -338,11 +338,12 @@
         <div class="setting-row">
           <div>
             <div class="setting-label">Layout do Teclado</div>
-            <div class="setting-sub" id="layout-detected">Auto-detectado na digitação</div>
+            <div class="setting-sub" id="layout-detected">Layout: QWERTY (auto-detectado ao digitar)</div>
+            <div class="setting-sub" id="layout-confidence" style="color:var(--text3);font-size:0.6rem;margin-top:0.15rem;font-style:italic;"></div>
           </div>
-          <select class="s-select" id="kb-layout" onchange="Settings.apply()">
-            <option value="qwerty">QWERTY</option>
-            <option value="abnt2">ABNT2</option>
+          <select class="s-select" id="kb-layout" onchange="Settings.applyLayout()">
+            <option value="qwerty">QWERTY (Internacional)</option>
+            <option value="abnt2">ABNT2 (PT Brasil — Ç)</option>
           </select>
         </div>
       </div>
